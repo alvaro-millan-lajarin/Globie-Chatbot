@@ -660,12 +660,29 @@ html, body {
 .chip:active { transform: translateY(0); }
 
 /* ═══════════════════════════════════════════════════════
+   CITY LABELS (DOM overlay)
+   ═══════════════════════════════════════════════════════ */
+.city-label {
+    position: absolute;
+    transform: translate(-50%, -140%);
+    background: rgba(4, 12, 36, 0.82);
+    color: #cce8ff;
+    font: 600 10px/1 Inter, Arial, sans-serif;
+    padding: 2px 5px 3px;
+    border-radius: 3px;
+    white-space: nowrap;
+    pointer-events: none;
+    border: 1px solid rgba(136,204,255,0.25);
+}
+
+/* ═══════════════════════════════════════════════════════
    TYPING INDICATOR
    ═══════════════════════════════════════════════════════ */
 .typing-wrap {
     display: flex; gap: 10px; align-items: flex-start;
     padding: 0 22px 10px; flex-shrink: 0;
 }
+.typing-wrap[hidden] { display: none; }
 .typing-bubble {
     background: var(--white);
     border: 1px solid var(--border);

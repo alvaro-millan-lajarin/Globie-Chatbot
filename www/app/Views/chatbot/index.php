@@ -45,6 +45,7 @@
 
     <div class="globe-canvas-wrap" id="globe-canvas-wrap">
         <canvas id="globe-canvas"></canvas>
+        <div id="city-label-overlay" style="position:absolute;inset:0;pointer-events:none;overflow:hidden"></div>
         <div class="globe-overlay-hint" id="globe-overlay-hint">
             <span>🌐</span>&nbsp;Loading globe…
         </div>
@@ -160,7 +161,7 @@
     </main>
 
     <!-- Typing indicator -->
-    <div class="typing-wrap" id="typing-indicator" hidden>
+    <div class="typing-wrap" id="typing-indicator" style="display:none">
         <div class="msg-avatar bot-av">🌍</div>
         <div class="typing-bubble">
             <span></span><span></span><span></span>
