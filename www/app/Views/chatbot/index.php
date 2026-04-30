@@ -27,6 +27,48 @@
     <span class="f-deco f-deco-5">📍</span>
 </div>
 
+<div class="app-layout">
+
+<!-- ══════════════ GLOBE PANEL ══════════════ -->
+<aside class="globe-panel" id="globe-panel">
+
+    <div class="gp-header">
+        <div class="gp-title-wrap">
+            <span class="gp-icon">🌍</span>
+            <div>
+                <div class="gp-title">Interactive Globe</div>
+                <div class="gp-hint">Drag · scroll to zoom</div>
+            </div>
+        </div>
+        <button class="btn-close-globe" id="btn-close-globe" title="Hide globe">✕</button>
+    </div>
+
+    <div class="globe-canvas-wrap" id="globe-canvas-wrap">
+        <canvas id="globe-canvas"></canvas>
+        <div class="globe-overlay-hint" id="globe-overlay-hint">
+            <span>🌐</span>&nbsp;Loading globe…
+        </div>
+    </div>
+
+    <div class="ranking-section">
+        <div class="ranking-hdr">
+            <span class="rank-icon">🏆</span>
+            <div class="rank-hdr-text">
+                <div class="rank-title">Country Rankings</div>
+                <div class="rank-sub" id="rank-sub">Based on your conversation</div>
+            </div>
+        </div>
+        <div class="ranking-list" id="ranking-list">
+            <div class="rank-empty">
+                <div class="rank-empty-icon">🗺️</div>
+                <p>Ask Globie about destinations and your personalised ranking will appear here!</p>
+            </div>
+        </div>
+    </div>
+
+</aside>
+
+<!-- ══════════════ CHAT WRAPPER ══════════════ -->
 <div class="chat-wrapper">
 
     <!-- ── HEADER ── -->
@@ -46,6 +88,14 @@
                     World Knowledge Assistant
                 </p>
             </div>
+
+            <button class="btn-icon btn-globe-toggle" id="btn-globe-toggle" title="Toggle globe panel">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+                    <circle cx="12" cy="12" r="10"/>
+                    <line x1="2" y1="12" x2="22" y2="12"/>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/>
+                </svg>
+            </button>
 
             <button class="btn-icon btn-clear" id="btn-clear" title="Clear chat">
                 <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
@@ -131,7 +181,6 @@
                 ></textarea>
             </div>
             <button type="submit" class="btn-send" id="btn-send" title="Send">
-                <!-- Paper plane -->
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                      stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round">
                     <line x1="22" y1="2" x2="11" y2="13"/>
@@ -146,14 +195,15 @@
         </p>
     </footer>
 
-</div>
+</div><!-- /.chat-wrapper -->
+</div><!-- /.app-layout -->
 
 <script>
-    // Stamp welcome message with current time
     const t = new Date();
     document.getElementById('welcome-time').textContent =
         t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 </script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script src="<?= base_url('assets/js/chatbot.js') ?>"></script>
 </body>
 </html>
