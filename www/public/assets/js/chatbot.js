@@ -162,10 +162,11 @@ const Globe = (() => {
         globeMesh = new THREE.Mesh(geo, mat);
         scene.add(globeMesh);
 
-        /* Load earth texture */
-        const loader = new THREE.TextureLoader();
+        /* Load earth texture from local assets */
+        const baseUrl = document.querySelector('meta[name="base-url"]').content.replace(/\/$/, '');
+        const loader  = new THREE.TextureLoader();
         loader.load(
-            'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/textures/planets/earth_atmos_2048.jpg',
+            `${baseUrl}/assets/textures/earth.jpg`,
             tex => {
                 mat.map = tex; mat.color.set(0xffffff); mat.needsUpdate = true;
                 const hint = document.getElementById('globe-overlay-hint');
@@ -173,7 +174,7 @@ const Globe = (() => {
             }
         );
         loader.load(
-            'https://cdn.jsdelivr.net/npm/three@0.128.0/examples/textures/planets/earth_specular_2048.jpg',
+            `${baseUrl}/assets/textures/earth_specular.jpg`,
             tex => { mat.specularMap = tex; mat.shininess = 30; mat.needsUpdate = true; }
         );
 
