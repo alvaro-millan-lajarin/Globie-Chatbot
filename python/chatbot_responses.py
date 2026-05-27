@@ -230,8 +230,8 @@ def show_city_info(city: str) -> str:
     budget  = row.get("budget_level", "N/A")
 
     return random.choice([
-        f"{name} is a city in {country}, located in the {region} region. Budget: {budget}. Best for: {best_for}.{desc_line}",
-        f"Located in {country} ({region}), {name} is a {budget.lower()} destination. Best for: {best_for}.{desc_line}",
+        f"{name} is a city in {country}, in the {region} region. Budget: {budget}. Best for: {best_for}.{desc_line}",
+        f"{name} ({country}, {region}) is a {budget.lower()} destination. Best for: {best_for}.{desc_line}",
         f"{name}, {country} — a {budget.lower()} city in the {region} area. Best for: {best_for}.{desc_line}",
     ])
 
@@ -365,8 +365,8 @@ def show_city_country_metric(city: str, metric_key: str) -> str:
 
     return random.choice([
         f"{row['city']} is in {row['country']}. {country_data}",
-        f"I track that at country level, so here's the data for {row['country']}: {country_data}",
         f"{row['city']} belongs to {row['country']}, so here's what I know: {country_data}",
+        f"{row['city']} ({row['country']}): {country_data}",
     ])
 
 

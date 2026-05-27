@@ -538,10 +538,16 @@ const Globe = (() => {
         while ((m = reRec.exec(text)) !== null)
             add(resolve(m[1].trim()) || resolve(m[2].trim()), Math.round(parseFloat(m[3]) * 12));
 
-        /* Single city card: has "Best for:" and "Budget:" */
-        if (/Best for:/i.test(text) && /Budget:/i.test(text)) {
+        /* Single city card: has "Best for:" */
+        if (/Best for:/i.test(text)) {
             const firstLine = text.split(/\r?\n/)[0].replace(/^[^\w(]+/, '').trim();
-            const cityName = (firstLine.match(/^([^,(]+)/) || [])[1]?.trim();
+            let cityName = null;
+            // "Name, Country — ..." (variant 3)
+            cityName = cityName || (firstLine.match(/^([A-Za-z][A-Za-z ]+?),\s+[A-Z]/) || [])[1]?.trim();
+            // "Name (Country...) ..." (variant 2)
+            cityName = cityName || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s*\(/) || [])[1]?.trim();
+            // "Name is a city in ..." (variant 1)
+            cityName = cityName || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+is\b/) || [])[1]?.trim();
             if (cityName) add(resolve(cityName), 50);
         }
 
@@ -549,21 +555,20 @@ const Globe = (() => {
         if (!/Best for:/i.test(text)) {
             const firstLine = text.split(/\r?\n/)[0].replace(/^[^\w]+/, '').trim();
             let name = null;
-            // "Name — xxx" or "Name: capital, population..."
+            // "Name — xxx"
             name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+—/) || [])[1]?.trim();
-            // "Name offers..." (country summary)
-            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+offers\b/) || [])[1]?.trim();
-            // "Name is generally..." (safety) or "Name is [X] overall" (cost)
-            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+is\s+(?:generally|a country)\b/) || [])[1]?.trim();
-            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+is\b.*\boverall\b/) || [])[1]?.trim();
-            // "Name has its capital..." (facts) or "Name has world-class..." (healthcare/pollution)
+            // "Name is [anything]" — summary, safety, cost, city info, city-country
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+is\b/) || [])[1]?.trim();
+            // "Name has [anything]" — healthcare, pollution, facts
             name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+has\b/) || [])[1]?.trim();
-            // "Healthcare/Safety/etc in Name is..." or "The capital of Name is..."
-            name = name || (text.match(/(?:healthcare|safety|air quality|capital)\s+(?:in|of)\s+([A-Z][A-Za-z ]+?)\s+is/i) || [])[1]?.trim();
-            // "right now in Name it's" or "weather in Name:"
-            name = name || (text.match(/(?:right now in|weather in)\s+([A-Za-z][A-Za-z ]+?)(?:\s+it's|\s+is|:)/i) || [])[1]?.trim();
-            // "Name is in Country." or "Name belongs to Country"
-            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+(?:is in|belongs to)/) || [])[1]?.trim();
+            // "Name offers [anything]" — summary, healthcare
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+offers\b/) || [])[1]?.trim();
+            // "Name's [anything]" — possessive (facts, pollution)
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)'s\b/) || [])[1]?.trim();
+            // "Name: [digit]" — weather compact
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?):\s+[\d-]/) || [])[1]?.trim();
+            // "Name, Country — [anything]" — city info variant 3 (extract city before comma)
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?),\s+[A-Z]/) || [])[1]?.trim();
             if (name) add(resolve(name), 25);
         }
 
