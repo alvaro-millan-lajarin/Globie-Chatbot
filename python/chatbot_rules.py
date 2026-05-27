@@ -6,14 +6,17 @@ from chatbot_responses import (
     CITY_TOPICS,
     COUNTRY_METRICS,
     city_metric_not_available,
+    show_city_country_metric,
     compare_cities,
     compare_countries,
     recommend_cities,
     show_best_cities,
     show_best_countries,
     show_city_info,
+    show_country_facts,
     show_country_metric,
     show_country_summary,
+    show_weather,
 )
 from chatbot_utils import find_mentions, has_keyword, normalize_text
 
@@ -41,6 +44,8 @@ RECOMMEND_WORDS = ["recommend", "suggest", "want", "prefer", "like"]
 CITY_WORDS = {"city", "destination", "place", "trip"}
 COUNTRY_WORDS = {"country", "countries"}
 COUNTRY_LEVEL_METRICS = {"safety", "cost", "healthcare", "pollution"}
+FACTS_WORDS = ["capital", "population", "currency", "language", "languages", "flag", "speak", "money"]
+WEATHER_WORDS = ["weather", "temperature", "forecast", "climate", "hot", "cold", "rain", "sunny"]
 
 
 def _pick_country_metric(text: str, tokens: list[str]) -> str:
@@ -109,6 +114,14 @@ def apply_rules(
             return recommend_cities(topics, budget_level)
         return HELP_TEXT
 
+    if has_keyword(text, tokens, WEATHER_WORDS):
+        place = countries[0] if countries else (cities[0] if cities else None)
+        if place:
+            return show_weather(place)
+
+    if has_keyword(text, tokens, FACTS_WORDS) and countries:
+        return show_country_facts(countries[0])
+
     if countries:
         if metric_key == "quality":
             return show_country_summary(countries[0])
@@ -116,7 +129,7 @@ def apply_rules(
 
     if cities:
         if metric_key in COUNTRY_LEVEL_METRICS and has_keyword(text, tokens, COUNTRY_METRICS[metric_key]["keywords"]):
-            return city_metric_not_available(cities[0], metric_key)
+            return show_city_country_metric(cities[0], metric_key)
         return show_city_info(cities[0])
 
     asks_best = has_keyword(text, tokens, ["best", "top", "rank", "ranking"])

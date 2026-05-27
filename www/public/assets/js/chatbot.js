@@ -548,6 +548,21 @@ const Globe = (() => {
             add(resolve(sumM[1]), qM ? Math.round(parseFloat(qM[1]) * 0.35) : 25);
         }
 
+        /* "City, Country\nRegion: ..." — single city info card */
+        if (/Region:/i.test(text) && /Budget:/i.test(text)) {
+            const firstLine = text.split(/\r?\n/)[0].trim();
+            const commaIdx = firstLine.indexOf(',');
+            if (commaIdx !== -1) {
+                const cityName = firstLine.slice(0, commaIdx).trim();
+                const key = resolve(cityName);
+                const allScores = [...text.matchAll(/\(([\d.]+)\/5\)/g)].map(x => parseFloat(x[1]));
+                const avg = allScores.length ? allScores.reduce((a, b) => a + b, 0) / allScores.length : 3;
+                const pts = Math.round(avg * 10);
+                console.log('[Globie] city card →', cityName, '| key:', key, '| pts:', pts);
+                add(key, pts);
+            }
+        }
+
         /* "Best option: Name" — comparison winner */
         const reWinner = /Best option:\s*([A-Z][A-Za-z ]+?)(?:[\n.!]|$)/g;
         while ((m = reWinner.exec(text)) !== null) add(resolve(m[1]), 35);

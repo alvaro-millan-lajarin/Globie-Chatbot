@@ -135,23 +135,9 @@
                     <p>¡Hola! I'm <strong>Globie</strong>, your personal travel & world knowledge guide. 🗺️</p>
                     <p>I use real data to answer about <strong>safety</strong>, <strong>cost of living</strong>, <strong>healthcare</strong>, <strong>quality of life</strong> and <strong>top cities</strong> for food, beaches, culture and more. I can also <strong>compare countries or cities</strong>!</p>
 
-                    <div class="region-row">
-                        <span class="rtag">🌍 Africa</span>
-                        <span class="rtag">🌎 Americas</span>
-                        <span class="rtag">🌏 Asia</span>
-                        <span class="rtag">🏔️ Europe</span>
-                        <span class="rtag">🌐 Oceania</span>
-                    </div>
-
                     <div class="suggestion-chips">
-                        <button class="chip">🛡️ Is Japan safe?</button>
-                        <button class="chip">💸 How expensive is Switzerland?</button>
-                        <button class="chip">🍜 Best city for food</button>
-                        <button class="chip">🗺️ Tell me about Paris</button>
-                        <button class="chip">🏥 Russia vs China healthcare</button>
-                        <button class="chip">🏖️ Where to go for beaches?</button>
-                        <button class="chip">🌍 Best country to live in</button>
-                        <button class="chip">🌿 Best city for nature</button>
+                        <button class="chip">Is Japan safe?</button>
+                        <button class="chip">Best city for food</button>
                     </div>
                 </div>
                 <span class="msg-time" id="welcome-time"></span>
@@ -205,6 +191,6 @@
         t.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 </script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
-<script src="<?= base_url('assets/js/chatbot.js') ?>"></script>
+<script src="<?= base_url('assets/js/chatbot.js') ?>?v=<?= filemtime(FCPATH . 'assets/js/chatbot.js') ?>"></script>
 </body>
 </html>

@@ -19,6 +19,7 @@ services:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./www/:/var/www
+      - ./python/:/var/www/python
       - ./docker-compose/PHP/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini
       - ./docker-compose/xdebug/xdebug.ini:/usr/local/etc/php/conf.d/docker-php-ext-xdebug.ini
       - ./docker-compose/xdebug/error_reporting.ini:/usr/local/etc/php/conf.d/error_reporting.ini

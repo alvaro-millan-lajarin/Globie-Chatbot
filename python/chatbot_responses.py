@@ -2,8 +2,20 @@ from typing import List, Optional
 
 import pandas as pd
 
+from chatbot_api import get_country_facts, get_weather
 from chatbot_data import df_cities, df_countries
 from chatbot_utils import format_number
+
+
+_WEATHER_CODES = {
+    0: "clear sky", 1: "mainly clear", 2: "partly cloudy", 3: "overcast",
+    45: "foggy", 48: "icy fog",
+    51: "light drizzle", 53: "drizzle", 55: "heavy drizzle",
+    61: "light rain", 63: "rain", 65: "heavy rain",
+    71: "light snow", 73: "snow", 75: "heavy snow",
+    80: "rain showers", 81: "showers", 82: "heavy showers",
+    95: "thunderstorm", 96: "thunderstorm with hail",
+}
 
 
 COUNTRY_METRICS = {
@@ -315,3 +327,40 @@ def city_metric_not_available(city: str, metric_key: str) -> str:
         return f"I only use {metric_label} at country level."
 
     return f"I only use {metric_label} at country level. Try asking about {row['country']}."
+
+
+def show_city_country_metric(city: str, metric_key: str) -> str:
+    row = _city_row(city)
+    if row is None:
+        return city_metric_not_available(city, metric_key)
+    country = str(row["country"]).lower().strip()
+    country_data = show_country_metric(country, metric_key)
+    return f"{row['city']} is in {row['country']}.\n{country_data}"
+
+
+def show_country_facts(country: str) -> str:
+    facts = get_country_facts(country)
+    if not facts:
+        return f"Sorry, I could not find information for {country.title()}."
+
+    return "\n".join([
+        f"{country.title()} — facts",
+        f"Capital: {facts['capital']}",
+        f"Population: {facts['population']:,}",
+        f"Languages: {facts['languages']}",
+        f"Currency: {facts['currencies']}",
+    ])
+
+
+def show_weather(place: str) -> str:
+    data = get_weather(place)
+    if not data:
+        return f"Sorry, I could not get weather data for {place.title()}."
+
+    description = _WEATHER_CODES.get(data["weathercode"], "unknown conditions")
+    return "\n".join([
+        f"Current weather in {data['place']}",
+        f"Temperature: {data['temperature']}°C",
+        f"Wind speed: {data['windspeed']} km/h",
+        f"Conditions: {description}",
+    ])
