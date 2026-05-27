@@ -518,58 +518,63 @@ const Globe = (() => {
             if (key) scores[key] = (scores[key] || 0) + pts;
         }
 
-        /* "1. Name (score)" — top-N list (city or country) */
-        const reTop = /^\s*(\d+)\.\s+([A-Za-z][A-Za-z ()'\-.]+?)\s+\(([\d.]+)\)\s*$/gm;
-        let m;
-        while ((m = reTop.exec(text)) !== null) {
-            const rank = parseInt(m[1]);
-            if (rank <= 10) add(resolve(m[2]), ([100,80,65,50,40,30,25,20,18,15][rank-1] || 10));
+        const RANK_PTS = [100, 80, 65, 50, 40, 30, 25, 20, 18, 15];
+        let m, rank;
+
+        /* Best countries list: "🥇 Japan — 79.3" or "4. Japan — 79.3" */
+        rank = 0;
+        const reTopCountry = /^(?:[^\x00-\x7F]+|\d+\.)\s+([A-Za-z][A-Za-z ()'\-.]+?)\s+—\s+([\d.]+)\s*$/gm;
+        while ((m = reTopCountry.exec(text)) !== null)
+            add(resolve(m[1].trim()), RANK_PTS[rank++] || 10);
+
+        /* Best cities list: "🥇 Milan, Italy (5.0 / 5)" */
+        rank = 0;
+        const reTopCity = /^(?:[^\x00-\x7F]+|\d+\.)\s+([^,\n]+),\s+([A-Za-z][A-Za-z ]+?)\s+\(([\d.]+)\s*\/\s*5\)\s*$/gm;
+        while ((m = reTopCity.exec(text)) !== null)
+            add(resolve(m[1].trim()) || resolve(m[2].trim()), Math.round(parseFloat(m[3]) * 12));
+
+        /* Recommendations: "🥇 Paris, France — Luxury (5.0/5)" */
+        const reRec = /^(?:[^\x00-\x7F]+|\d+\.)\s+([^,\n]+),\s+([A-Za-z][A-Za-z ]+?)\s+—\s+\S+\s+\(([\d.]+)\s*\/\s*5\)/gm;
+        while ((m = reRec.exec(text)) !== null)
+            add(resolve(m[1].trim()) || resolve(m[2].trim()), Math.round(parseFloat(m[3]) * 12));
+
+        /* Single city card: has "Best for:" and "Budget:" */
+        if (/Best for:/i.test(text) && /Budget:/i.test(text)) {
+            const firstLine = text.split(/\r?\n/)[0].replace(/^[^\w(]+/, '').trim();
+            const cityName = (firstLine.match(/^([^,(]+)/) || [])[1]?.trim();
+            if (cityName) add(resolve(cityName), 50);
         }
 
-        /* "1. City, Country (score/5)" — top-N city list */
-        const reCityTop = /^\s*(\d+)\.\s+([^,\n]+),\s+([A-Za-z][A-Za-z ]+?)\s+\(([\d.]+)\/5\)\s*$/gm;
-        while ((m = reCityTop.exec(text)) !== null) {
-            const pts = Math.round(parseFloat(m[4]) * 12);
-            add(resolve(m[2]) || resolve(m[3]), pts);
+        /* Single country / city-country metric response */
+        if (!/Best for:/i.test(text)) {
+            const firstLine = text.split(/\r?\n/)[0].replace(/^[^\w]+/, '').trim();
+            let name = null;
+            // "Name — xxx" or "Name: capital, population..."
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+—/) || [])[1]?.trim();
+            // "Name offers..." (country summary)
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+offers\b/) || [])[1]?.trim();
+            // "Name is generally..." (safety) or "Name is [X] overall" (cost)
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+is\s+(?:generally|a country)\b/) || [])[1]?.trim();
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+is\b.*\boverall\b/) || [])[1]?.trim();
+            // "Name has its capital..." (facts) or "Name has world-class..." (healthcare/pollution)
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+has\b/) || [])[1]?.trim();
+            // "Healthcare/Safety/etc in Name is..." or "The capital of Name is..."
+            name = name || (text.match(/(?:healthcare|safety|air quality|capital)\s+(?:in|of)\s+([A-Z][A-Za-z ]+?)\s+is/i) || [])[1]?.trim();
+            // "right now in Name it's" or "weather in Name:"
+            name = name || (text.match(/(?:right now in|weather in)\s+([A-Za-z][A-Za-z ]+?)(?:\s+it's|\s+is|:)/i) || [])[1]?.trim();
+            // "Name is in Country." or "Name belongs to Country"
+            name = name || (firstLine.match(/^([A-Za-z][A-Za-z ]+?)\s+(?:is in|belongs to)/) || [])[1]?.trim();
+            if (name) add(resolve(name), 25);
         }
 
-        /* "1. City, Country - Budget - score/5" — recommendations */
-        const reRec = /^\s*(\d+)\.\s+([^,\n]+),\s+([A-Za-z][A-Za-z ]+?)\s+-\s+\w+\s+-\s+([\d.]+)\/5/gm;
-        while ((m = reRec.exec(text)) !== null) {
-            const pts = Math.round(parseFloat(m[4]) * 12);
-            add(resolve(m[2]) || resolve(m[3]), pts);
-        }
+        /* Comparison winner: "Winner: Name ✅" or "Best pick: Name ✅" */
+        const reWinner = /(?:Winner|Best pick|Best option):\s*([A-Z][A-Za-z ,]+?)(?:\s*✅|\s*[\n.!]|$)/g;
+        while ((m = reWinner.exec(text)) !== null)
+            add(resolve(m[1].split(',')[0].trim()), 35);
 
-        /* "Name - metric..." — single entity summary */
-        const reSummary = /^([A-Z][A-Za-z][A-Za-z ]+?)\s+-\s+[\w ]+$/m;
-        const sumM = reSummary.exec(text);
-        if (sumM) {
-            const qM = /Quality of life index:\s*([\d.]+)/.exec(text);
-            add(resolve(sumM[1]), qM ? Math.round(parseFloat(qM[1]) * 0.35) : 25);
-        }
-
-        /* "City, Country\nRegion: ..." — single city info card */
-        if (/Region:/i.test(text) && /Budget:/i.test(text)) {
-            const firstLine = text.split(/\r?\n/)[0].trim();
-            const commaIdx = firstLine.indexOf(',');
-            if (commaIdx !== -1) {
-                const cityName = firstLine.slice(0, commaIdx).trim();
-                const key = resolve(cityName);
-                const allScores = [...text.matchAll(/\(([\d.]+)\/5\)/g)].map(x => parseFloat(x[1]));
-                const avg = allScores.length ? allScores.reduce((a, b) => a + b, 0) / allScores.length : 3;
-                const pts = Math.round(avg * 10);
-                console.log('[Globie] city card →', cityName, '| key:', key, '| pts:', pts);
-                add(key, pts);
-            }
-        }
-
-        /* "Best option: Name" — comparison winner */
-        const reWinner = /Best option:\s*([A-Z][A-Za-z ]+?)(?:[\n.!]|$)/g;
-        while ((m = reWinner.exec(text)) !== null) add(resolve(m[1]), 35);
-
-        /* "- Name: score" — comparison sides */
-        const reComp = /^-\s+([A-Z][A-Za-z ]+?):\s*[\d.]+/gm;
-        while ((m = reComp.exec(text)) !== null) add(resolve(m[1]), 15);
+        /* Comparison sides: "  • Name: score" or "Name: score" */
+        const reComp = /^[\s•]*([A-Z][A-Za-z ]+?):\s*[\d.]+(?:\s*\/\s*5)?\s*$/gm;
+        while ((m = reComp.exec(text)) !== null) add(resolve(m[1].trim()), 15);
 
         return scores;
     }
