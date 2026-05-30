@@ -1,0 +1,24 @@
+{
+  "name": "globie",
+  "version": "1.0.0",
+  "description": "> A conversational assistant that answers questions about cities and countries, with a live 3D globe that visualizes recommendations in real time.",
+  "main": "globie_presentation.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/alvaro-millan-lajarin/Globie-Chatbot-.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/alvaro-millan-lajarin/Globie-Chatbot-/issues"
+  },
+  "homepage": "https://github.com/alvaro-millan-lajarin/Globie-Chatbot-#readme",
+  "dependencies": {
+    "pptxgenjs": "^4.0.1"
+  }
+}

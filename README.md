@@ -3,7 +3,8 @@
 > A conversational assistant that answers questions about cities and countries, with a live 3D globe that visualizes recommendations in real time.
 
 <!-- IMAGEN PRINCIPAL -->
-![img_2.png](img_2.png)
+
+![img.png](img.png)
 
 
 ---
