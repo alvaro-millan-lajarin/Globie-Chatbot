@@ -1,26 +1,18 @@
-"""
-External API helpers — all free, no API key required.
-
-- REST Countries (restcountries.com) : capital, population, currency, languages
-- Open-Meteo geocoding + forecast    : current weather for any place
-"""
-
 import requests
 
-_TIMEOUT = 5
+TIMEOUT = 5
 
 
-def _get(url: str, params: dict = None):
+def _get(url, params=None):
     try:
-        r = requests.get(url, params=params, timeout=_TIMEOUT)
+        r = requests.get(url, params=params, timeout=TIMEOUT)
         r.raise_for_status()
         return r.json()
     except Exception:
         return None
 
 
-def get_country_facts(country_name: str) -> dict | None:
-    """Return basic facts for a country using REST Countries API."""
+def get_country_facts(country_name):
     data = _get(f"https://restcountries.com/v3.1/name/{country_name}", params={"fullText": "true"})
     if not data:
         data = _get(f"https://restcountries.com/v3.1/name/{country_name}")
@@ -47,8 +39,7 @@ def get_country_facts(country_name: str) -> dict | None:
     }
 
 
-def get_weather(place_name: str) -> dict | None:
-    """Return current weather for a place using Open-Meteo (no key needed)."""
+def get_weather(place_name):
     geo = _get(
         "https://geocoding-api.open-meteo.com/v1/search",
         params={"name": place_name, "count": 1, "language": "en"},

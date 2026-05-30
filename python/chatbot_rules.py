@@ -48,14 +48,14 @@ FACTS_WORDS = ["capital", "population", "currency", "language", "languages", "fl
 WEATHER_WORDS = ["weather", "temperature", "forecast", "climate", "hot", "cold", "rain", "sunny"]
 
 
-def _pick_country_metric(text: str, tokens: list[str]) -> str:
+def _pick_country_metric(text, tokens):
     for metric_key, config in COUNTRY_METRICS.items():
         if has_keyword(text, tokens, config["keywords"]):
             return metric_key
     return "quality"
 
 
-def _pick_city_topics(text: str, tokens: list[str]) -> list[str]:
+def _pick_city_topics(text, tokens):
     topics = []
     for topic_key, config in CITY_TOPICS.items():
         if has_keyword(text, tokens, config["keywords"]):
@@ -63,7 +63,7 @@ def _pick_city_topics(text: str, tokens: list[str]) -> list[str]:
     return topics
 
 
-def _pick_budget_level(text: str, tokens: list[str]):
+def _pick_budget_level(text, tokens):
     if has_keyword(text, tokens, ["budget", "cheap", "affordable"]):
         return "Budget"
     if has_keyword(text, tokens, ["luxury", "premium", "exclusive"]):
@@ -71,14 +71,7 @@ def _pick_budget_level(text: str, tokens: list[str]):
     return None
 
 
-def _is_recommendation(
-    text: str,
-    tokens: list[str],
-    verbs_lemm: list[str],
-    wh_words: list[str],
-    countries: list[str],
-    cities: list[str],
-) -> bool:
+def _is_recommendation(text, tokens, verbs_lemm, wh_words, countries, cities):
     if countries or cities:
         return False
 
@@ -88,13 +81,7 @@ def _is_recommendation(
     )
 
 
-def apply_rules(
-    text: str,
-    tokens: list[str],
-    nouns: list[str],
-    verbs_lemm: list[str],
-    wh_words: list[str],
-) -> str:
+def apply_rules(text, tokens, nouns, verbs_lemm, wh_words):
     countries = find_mentions(text, COUNTRY_NAMES)
     cities = find_mentions(text, CITY_NAMES)
     metric_key = _pick_country_metric(text, tokens)
@@ -144,7 +131,7 @@ def apply_rules(
     return HELP_TEXT
 
 
-def chatbot_response(sentence: str) -> str:
+def chatbot_response(sentence):
     text = normalize_text(sentence)
     words = nltk.word_tokenize(text)
     tags = nltk.pos_tag(words)

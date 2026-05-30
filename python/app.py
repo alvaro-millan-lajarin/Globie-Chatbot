@@ -1,12 +1,3 @@
-"""
-Globie — Python Flask chatbot server
-=====================================
-Start with:  python3 app.py
-Runs at:     http://localhost:5000
-
-PHP (ChatbotController) calls POST /chat with JSON {"message": "..."}
-"""
-
 from flask import Flask, jsonify, request
 from chatbot_rules import chatbot_response
 
@@ -33,8 +24,5 @@ def chat():
 
 
 if __name__ == "__main__":
-    print("=" * 50)
-    print("  Globie chatbot running at http://localhost:5000")
-    print("  Keep this terminal open while using the web app")
-    print("=" * 50)
+    print("Globie chatbot corriendo en http://localhost:5000")
     app.run(debug=False, port=5000, host="0.0.0.0")

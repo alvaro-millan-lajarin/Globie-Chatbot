@@ -1,5 +1,4 @@
 import random
-from typing import List, Optional
 
 import pandas as pd
 
@@ -120,7 +119,7 @@ def _top_rows(df: pd.DataFrame, column: str, higher_is_better: bool, limit: int)
     return ranked.nlargest(limit, column) if higher_is_better else ranked.nsmallest(limit, column)
 
 
-def _city_scores(row) -> List[tuple[str, float]]:
+def _city_scores(row):
     scores = []
     for topic in CITY_TOPICS.values():
         value = pd.to_numeric(pd.Series([row.get(topic["column"])]), errors="coerce").iloc[0]
@@ -194,7 +193,7 @@ def show_country_metric(country: str, metric_key: str) -> str:
     ])
 
 
-def show_best_countries(metric_key: str) -> str:
+def show_best_countries(metric_key):
     metric  = COUNTRY_METRICS[metric_key]
     ranked  = _top_rows(df_countries, metric["column"], metric["higher_is_better"], 5)
     entries = [
@@ -252,7 +251,7 @@ def show_best_cities(topic_key: str) -> str:
     ])
 
 
-def compare_countries(countries: List[str], metric_key: str) -> str:
+def compare_countries(countries, metric_key):
     metric = COUNTRY_METRICS[metric_key]
     scale  = metric_key if metric_key in ("safety", "cost", "healthcare", "pollution", "quality") else "quality"
     scored = []
@@ -279,7 +278,7 @@ def compare_countries(countries: List[str], metric_key: str) -> str:
     ])
 
 
-def compare_cities(cities: List[str], topic_key: Optional[str] = None) -> str:
+def compare_cities(cities, topic_key=None):
     rows = []
     for city in cities[:2]:
         row = _city_row(city)
@@ -313,7 +312,7 @@ def compare_cities(cities: List[str], topic_key: Optional[str] = None) -> str:
     ])
 
 
-def recommend_cities(topic_keys: List[str], budget_level: Optional[str] = None) -> str:
+def recommend_cities(topic_keys, budget_level=None):
     cities = df_cities.copy()
 
     if budget_level:
