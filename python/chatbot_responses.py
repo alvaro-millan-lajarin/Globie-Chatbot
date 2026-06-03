@@ -369,7 +369,7 @@ def show_city_country_metric(city: str, metric_key: str) -> str:
     ])
 
 
-def show_country_facts(country: str) -> str:
+def show_country_facts(country: str, fact_key: str = None) -> str:
     facts = get_country_facts(country)
     if not facts:
         return f"Sorry, I could not find information for {country.title()}."
@@ -379,6 +379,34 @@ def show_country_facts(country: str) -> str:
     pop  = f"{facts['population']:,}"
     lang = facts["languages"]
     curr = facts["currencies"]
+
+    if fact_key == "capital":
+        return random.choice([
+            f"The capital of {n} is {cap}.",
+            f"{n}'s capital city is {cap}.",
+            f"{cap} is the capital of {n}.",
+        ])
+
+    if fact_key == "population":
+        return random.choice([
+            f"{n} has a population of {pop}.",
+            f"The population of {n} is {pop}.",
+            f"There are {pop} people living in {n}.",
+        ])
+
+    if fact_key == "languages":
+        return random.choice([
+            f"People in {n} speak {lang}.",
+            f"The official language(s) of {n} are {lang}.",
+            f"{n} has the following official language(s): {lang}.",
+        ])
+
+    if fact_key == "currencies":
+        return random.choice([
+            f"The currency used in {n} is {curr}.",
+            f"{n} uses {curr} as its currency.",
+            f"In {n}, people pay with {curr}.",
+        ])
 
     return random.choice([
         f"{n} has its capital in {cap} and a population of {pop}. People speak {lang} there, and the currency is {curr}.",

@@ -18,7 +18,7 @@ from chatbot_responses import (
     show_country_summary,
     show_weather,
 )
-from chatbot_utils import find_mentions, has_keyword, normalize_text
+from chatbot_utils import find_mentions, has_keyword, normalize_text, suggest_correction
 
 
 nltk.download("punkt", quiet=True)
@@ -45,7 +45,36 @@ CITY_WORDS = {"city", "destination", "place", "trip"}
 COUNTRY_WORDS = {"country", "countries"}
 COUNTRY_LEVEL_METRICS = {"safety", "cost", "healthcare", "pollution"}
 FACTS_WORDS = ["capital", "population", "currency", "language", "languages", "flag", "speak", "money"]
+
+_FACT_KEYS = {
+    "capital": ["capital", "capital city"],
+    "population": ["population", "inhabitants", "how many people", "people live"],
+    "languages": ["language", "languages", "speak", "official language"],
+    "currencies": ["currency", "currencies", "money"],
+}
 WEATHER_WORDS = ["weather", "temperature", "forecast", "climate", "hot", "cold", "rain", "sunny"]
+
+_VOCABULARY = set(
+    COUNTRY_NAMES + CITY_NAMES + WEATHER_WORDS + FACTS_WORDS + COMPARISON_WORDS + [
+        "safe", "safety", "crime", "cost", "expensive", "cheap", "affordable", "budget",
+        "rent", "health", "healthcare", "hospital", "medical", "clean", "pollution",
+        "polluted", "environment", "quality", "life", "living",
+        "culture", "art", "history", "museum", "adventure", "hiking", "trekking",
+        "mountain", "explore", "nature", "forest", "lake", "wildlife",
+        "beach", "beaches", "sea", "coast", "island", "nightlife", "party", "club", "bar",
+        "food", "cuisine", "restaurant", "eat", "gastronomy", "wellness", "spa",
+        "relax", "calm", "urban", "modern", "quiet", "seclusion", "remote", "peaceful",
+        "best", "top", "rank", "ranking", "recommend", "suggest", "want", "prefer",
+        "city", "destination", "place", "trip", "country", "countries",
+    ]
+)
+
+
+def _pick_fact_key(text, tokens):
+    for key, keywords in _FACT_KEYS.items():
+        if has_keyword(text, tokens, keywords):
+            return key
+    return None
 
 
 def _pick_country_metric(text, tokens):
@@ -107,7 +136,7 @@ def apply_rules(text, tokens, nouns, verbs_lemm, wh_words):
             return show_weather(place)
 
     if has_keyword(text, tokens, FACTS_WORDS) and countries:
-        return show_country_facts(countries[0])
+        return show_country_facts(countries[0], _pick_fact_key(text, tokens))
 
     if countries:
         if metric_key == "quality":
@@ -141,5 +170,10 @@ def chatbot_response(sentence):
     verbs_lemm = [lemmatizer.lemmatize(word, pos="v") for word in verbs]
     wh_words = [word for word, tag in tags if tag.startswith("W")]
     tokens = [word for word in words if word.isalpha()]
+
+    correction = suggest_correction(tokens, _VOCABULARY)
+    if correction:
+        misspelled, corrected = correction
+        return f'Did you mean "{corrected}"?'
 
     return apply_rules(text, tokens, nouns, verbs_lemm, wh_words)

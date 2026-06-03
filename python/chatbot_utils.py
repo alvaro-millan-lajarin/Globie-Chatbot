@@ -1,4 +1,5 @@
 import re
+import difflib
 
 
 def normalize_text(text):
@@ -24,6 +25,16 @@ def has_keyword(text, tokens, keywords):
         elif keyword in tokens:
             return True
     return False
+
+
+def suggest_correction(tokens, vocabulary):
+    for token in tokens:
+        if len(token) < 4 or token in vocabulary:
+            continue
+        matches = difflib.get_close_matches(token, vocabulary, n=1, cutoff=0.8)
+        if matches:
+            return token, matches[0]
+    return None
 
 
 def format_number(value):
