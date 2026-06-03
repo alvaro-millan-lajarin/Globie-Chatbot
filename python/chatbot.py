@@ -1,20 +1,7 @@
-"""
-Globie Chatbot — entry point called by PHP (ChatbotController.php)
-==================================================================
-Usage:
-    python3 chatbot.py "Is Japan safe?"
-
-Output: JSON  {"reply": "..."}
-
-Logic lives in chatbot_rules.py (ported from Downloads/ChatBot).
-Data comes from the CSV files in assets/.
-"""
-
 import sys
 import json
 import os
 
-# Make sure sibling modules are importable regardless of cwd
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 from chatbot_rules import chatbot_response

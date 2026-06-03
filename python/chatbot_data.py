@@ -4,7 +4,7 @@ import pandas as pd
 
 
 BASE_DIR  = Path(__file__).resolve().parent
-ASSET_DIR = BASE_DIR / "assets"          # fixed: was "asset" (typo in original)
+ASSET_DIR = BASE_DIR / "assets"
 
 
 def _read_csv(filename: str) -> pd.DataFrame:

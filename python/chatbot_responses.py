@@ -183,7 +183,6 @@ def show_country_metric(country: str, metric_key: str) -> str:
             f"{n} is known for having {hlth} available across the country.",
         ])
 
-    # pollution
     poll = interpret(row["Pollution Index"], "pollution")
     fresh = "great for those who enjoy fresh air" if "clean" in poll else "worth considering if you are sensitive to pollution"
     return random.choice([
